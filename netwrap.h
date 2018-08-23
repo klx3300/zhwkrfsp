@@ -12,7 +12,8 @@ struct ConnInfo {
 
 int listenat(const char* addrxport, qSocket* listensock);
 int serveat(qSocket* listener, void* (*routine)(void* conninfo));
-int sockread(qSocket sock, qBinarySafeString bss, int intended);
-int sockwrite(qSocket sock, qBinarySafeString bss, int auto_free);
+// read will utilize qbss_append(), this is not filling!
+int sockread(qSocket sock, qBinarySafeString* bss, int intended);
+int sockwrite(qSocket sock, qBinarySafeString* bss, int auto_free);
 
 #endif
