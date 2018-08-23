@@ -3,6 +3,8 @@
 
 #include <inttypes.h>
 #include <sys/stat.h>
+#include "zhwkre/bss.h"
+#include "zhwkre/network.h"
 
 #define FILENAME_LEN 4096
 
@@ -71,5 +73,11 @@ struct OpWrit{
 struct OpClos{
     uint64_t file_handle;
 };
+
+int wait_operation(qSocket streamsock, struct OpHdr* desthdr);
+int as_open(qSocket streamsock, struct OpOpen* dest);
+int as_read(qSocket streamsock, struct OpRead* dest);
+int as_write(qSocket streamsock, struct OpWrit* dest, void* buffer, size_t buflen);
+int as_close(qSocket streamsock, struct OpClos* dest);
 
 #endif
