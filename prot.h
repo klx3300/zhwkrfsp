@@ -5,6 +5,7 @@
 #include <sys/stat.h>
 #include "zhwkre/bss.h"
 #include "zhwkre/network.h"
+#include "netwrap.h"
 
 #define FILENAME_LEN 4096
 
@@ -74,10 +75,10 @@ struct OpClos{
     uint64_t file_handle;
 };
 
-int wait_operation(qSocket streamsock, struct OpHdr* desthdr);
-int as_open(qSocket streamsock, struct OpOpen* dest);
-int as_read(qSocket streamsock, struct OpRead* dest);
-int as_write(qSocket streamsock, struct OpWrit* dest, void* buffer, size_t buflen);
-int as_close(qSocket streamsock, struct OpClos* dest);
+int wait_operation(qSocket streamsock, struct OpHdr* desthdr, struct ConnInfo ci);
+int as_open(qSocket streamsock, struct OpOpen* dest, struct ConnInfo ci);
+int as_read(qSocket streamsock, struct OpRead* dest, struct ConnInfo ci);
+int as_write(qSocket streamsock, struct OpWrit* dest, void* buffer, size_t remain, struct ConnInfo ci);
+int as_close(qSocket streamsock, struct OpClos* dest, struct ConnInfo ci);
 
 #endif
