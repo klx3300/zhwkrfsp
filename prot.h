@@ -26,6 +26,7 @@ struct RpHdr {
 #define OPEN_DIRECTORY 4
 #define OPEN_NOFOLLOW  8
 #define OPEN_TRUNC     16
+#define OPEN_MKDIR     32
 
 struct OpOpen {
     char filename[FILENAME_LEN];
@@ -62,6 +63,8 @@ struct RdDir{
 #define WR_REGULAR 0
 #define WR_CHMOD   1
 #define WR_SYMLINK 2
+#define WR_REMOVE  3
+#define WR_TRUNC   4
 
 struct OpWrit{
     char filename[FILENAME_LEN];

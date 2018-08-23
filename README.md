@@ -55,6 +55,7 @@ struct OpOpen {
        bool directory; // fail if not a directory (4)
        bool nofollow; // fail with ELOOP if is a symbolic link (8)
        bool truncate; // clear the whole file if previously exists. (16)
+       bool mkdir; // if this set, will make directory. No file_handle returned.(32)
     */
 };
 ```
@@ -138,7 +139,7 @@ struct OpWrit{
     uint64_t file_handle;
     uint64_t offset;
     uint64_t count;
-    uint8_t write_mode; // 0 REGULAR; 1 CHMOD; 2 SYMLINK
+    uint8_t write_mode; // 0 REGULAR; 1 CHMOD; 2 SYMLINK; 3 REMOVE; 4 TRUNC
 };
 ```
 
@@ -152,9 +153,15 @@ or
 
 or
 
-the filename of the symbolic link source file - for symlink
+the filename of the symbolic link source file/the file you want to delete - for symlink and remove
 
-when you creating symbolic links, directly send write request with `filename` set to the link name, no open needed, as `file_handle` will get ignored if mode is `SYMLINK`.
+when you creating symbolic links, directly send write request with `filename` set to the link name, no open needed, as `file_handle` will get ignored if mode is `SYMLINK/REMOVE`.
+
+or
+
+nothing - for truncate files.
+
+in this case, the count will be ignored, and the file will be truncated at position `offset`.
 
 Reply:
 
