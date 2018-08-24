@@ -24,7 +24,7 @@ Every operation has a unified header, that is:
 ```C
 struct OpHdr {
     uint32_t size; // include the header and content.
-    uint32_t ouid; // Operation Unique ID. This allows out-of-order execution.
+    uint32_t ouid; // Operation Unique ID. This allows better logging.
     uint32_t opid; // Which operation.
 };
 ```
@@ -34,7 +34,7 @@ For replies, there are also a unified header, that is:
 ```C
 struct RpHdr {
     uint32_t size; // I don't need to explain twice, do I?
-    uint32_t ouid; // Which operation you are replying to?
+    uint32_t ouid; // logging.
      int32_t rtvl; // Return value. for errors, use negative numbers.
 };
 ```
@@ -82,6 +82,8 @@ struct RpOpen{
 
 Very simple.
 
+for mode `mkdir`, you need not to reply.
+
 #### Read(1)
 
 Request:
@@ -115,7 +117,7 @@ struct RdDir{
 
 or
 
-`struct stat` exactly - for stat reads;
+`struct stat` exactly - for stat reads; please always use filename: file handle may be inapplicable.
 
 or
 
@@ -149,13 +151,13 @@ content need to be written - for regular writes
 
 or
 
-`mode_t` - for chmod
+`mode_t` - for chmod, no open needed also.
 
 or
 
-the filename of the symbolic link source file/the file you want to delete - for symlink and remove
+the filename of the symbolic link source file/the file you want to delete, filled to 4096 bytes - for symlink and remove
 
-when you creating symbolic links, directly send write request with `filename` set to the link name, no open needed, as `file_handle` will get ignored if mode is `SYMLINK/REMOVE`.
+when you cfreating symbolic links, directly send write request with `filename` set to the link name, no open needed, as `file_handle` will get ignored if mode is `SYMLINK/REMOVE`.
 
 or
 

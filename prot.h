@@ -9,6 +9,11 @@
 
 #define FILENAME_LEN 4096
 
+#define OPER_OPEN  0
+#define OPER_READ  1
+#define OPER_WRITE 2
+#define OPER_CLOSE 3
+
 struct OpHdr {
     uint32_t size;
     uint32_t ouid;
