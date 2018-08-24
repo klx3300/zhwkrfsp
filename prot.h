@@ -84,4 +84,9 @@ int as_read(qSocket streamsock, struct OpRead* dest, struct ConnInfo ci);
 int as_write(qSocket streamsock, struct OpWrit* dest, void* buffer, size_t remain, struct ConnInfo ci);
 int as_close(qSocket streamsock, struct OpClos* dest, struct ConnInfo ci);
 
+int wait_reply(qSocket sock, struct RpHdr* rephdr, struct ConnInfo ci);
+int re_open(qSocket sock, struct RpOpen* dest, struct ConnInfo ci);
+int re_read(qSocket sock, void* buffer, size_t remain, struct ConnInfo ci);
+// write and close doesn't return extra informations.
+
 #endif

@@ -74,3 +74,39 @@ int as_close(qSocket streamsock, struct OpClos* dest, struct ConnInfo ci){
     qbss_destructor(recvbuf);
     return 0;
 }
+
+int wait_reply(qSocket sock, struct RpHdr* rephdr, struct ConnInfo ci){
+    qBinarySafeString recvbuf = qbss_constructor();
+    if(sockread(sock, &recvbuf, sizeof(struct RpHdr))){
+        qLogWarnfmt("wait_reply(): Read fail at %d[%s] %s\n", ci.connuid, ci.srcaddr, strerror(errno));
+        qbss_destructor(recvbuf);
+        return -1;
+    }
+    memcpy(rephdr, recvbuf.str, sizeof(struct RpHdr));
+    qbss_destructor(recvbuf);
+    return 0;
+}
+
+int re_open(qSocket sock, struct RpOpen* dest, struct ConnInfo ci){
+    qBinarySafeString recvbuf = qbss_constructor();
+    if(sockread(sock, &recvbuf, sizeof(struct RpOpen))){
+        qLogWarnfmt("re_open(): Read fail at %d[%s] %s\n", ci.connuid, ci.srcaddr, strerror(errno));
+        qbss_destructor(recvbuf);
+        return -1;
+    }
+    memcpy(dest, recvbuf.str, sizeof(struct RpOpen));
+    qbss_destructor(recvbuf);
+    return 0;
+}
+
+int re_read(qSocket sock, void* buffer, size_t remain, struct ConnInfo ci){
+    qBinarySafeString bss = qbss_constructor();
+    if(sockread(sock, &bss, remain)){
+        qLogWarnfmt("re_open(): Read fail at %d[%s] %s\n", ci.connuid, ci.srcaddr, strerror(errno));
+        qbss_destructor(bss);
+        return -1;
+    }
+    memcpy(buffer, bss.str, remain);
+    qbss_destructor(bss);
+    return 0;
+}
