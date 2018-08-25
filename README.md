@@ -94,7 +94,7 @@ struct OpRead{
     uint64_t file_handle; // or you are using it, use this
     uint64_t offset; // starting from where
     uint64_t count; // read how much
-    uint8_t  read_mode; // 0 REGULAR; 1 STAT; 2 STATFS; 3 RDLINK
+    uint8_t  read_mode; // 0 REGULAR; 1 STAT; 2 STATFS; 3 RDLINK; 4 RDDIR
 };
 ```
 
@@ -102,18 +102,7 @@ Reply:
 
 No format, just follow by exact the bytes you read. - for regular reads;
 
-when executing read on a directory, the return value should be
-
-```C
-struct RdDir{
-    char filename[4096];
-    uint8_t extflags; // from the lowest bit to highest bit, corresponding to following flags.
-    /*
-       bool have_stat; // indicates that if this is a creation request. (1)
-    */
-    struct stat filestat; // only work if have_stat is set.
-};
-```
+when executing read on a directory, the return value should be an array of `struct dirent`.
 
 or
 
@@ -141,7 +130,7 @@ struct OpWrit{
     uint64_t file_handle;
     uint64_t offset;
     uint64_t count;
-    uint8_t write_mode; // 0 REGULAR; 1 CHMOD; 2 SYMLINK; 3 REMOVE; 4 TRUNC
+    uint8_t write_mode; // 0 REGULAR; 1 CHMOD; 2 SYMLINK; 3 REMOVE; 4 TRUNC; 5 ACCES
 };
 ```
 
@@ -151,7 +140,9 @@ content need to be written - for regular writes
 
 or
 
-`mode_t` - for chmod, no open needed also.
+`mode_t` - for chmod/acces, no open needed also.
+
+acces mode will test the permission against the specified file.
 
 or
 
@@ -176,6 +167,7 @@ Request:
 ```C
 struct OpClos{
 	uint64_t file_handle;
+    uint8_t is_dir;
 };
 ```
 

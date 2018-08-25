@@ -15,7 +15,7 @@ int fuse_chmod(const char* fn, mode_t mode, struct fuse_file_info* fi);
 int fuse_truncate(const char* fn, off_t pos, struct fuse_file_info* fi);
 int fuse_open(const char* fn, struct fuse_file_info* fi);
 int fuse_read(const char* fn, char* buf, size_t bufsize, off_t pos, struct fuse_file_info* fi);
-int fuse_write(const char* fn, const char* buf, size_t bufsize, off_t pos, struct fuse_file_info fi);
+int fuse_write(const char* fn, const char* buf, size_t bufsize, off_t pos, struct fuse_file_info* fi);
 int fuse_statfs(const char* fn, struct statvfs* fstat);
 int fuse_release(const char* fn, struct fuse_file_info* fi);
 int fuse_opendir(const char* dn, struct fuse_file_info* fi);

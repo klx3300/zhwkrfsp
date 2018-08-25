@@ -48,6 +48,7 @@ struct RpOpen {
 #define RD_STAT    1
 #define RD_STATFS  2
 #define RD_LINK    3
+#define RD_DIR     4
 
 struct OpRead {
     char filename[FILENAME_LEN];
@@ -70,6 +71,7 @@ struct RdDir{
 #define WR_SYMLINK 2
 #define WR_REMOVE  3
 #define WR_TRUNC   4
+#define WR_ACCES   5
 
 struct OpWrit{
     char filename[FILENAME_LEN];
@@ -81,6 +83,7 @@ struct OpWrit{
 
 struct OpClos{
     uint64_t file_handle;
+    uint8_t is_dir;
 };
 
 int wait_operation(qSocket streamsock, struct OpHdr* desthdr, struct ConnInfo ci);

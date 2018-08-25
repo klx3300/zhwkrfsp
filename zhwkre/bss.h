@@ -15,7 +15,7 @@ qBinarySafeString qbss_constructor(); // create a binary_safe_string
 qBinarySafeString qbss__from_array(void* arr,unsigned int size);
 
 #define qbss_append(bss,str,len) q__bss_append(&(bss),str,len)
-void q__bss_append(qBinarySafeString* bss,char* str,unsigned int len);
+void q__bss_append(qBinarySafeString* bss,const char* str,unsigned int len);
 // any operation on the destructed bss is strictly prohibited.
 // dont risk your time doing something silly
 void qbss_destructor(qBinarySafeString bss);

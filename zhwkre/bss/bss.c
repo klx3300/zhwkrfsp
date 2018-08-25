@@ -24,7 +24,7 @@ qBinarySafeString qbss__from_array(void* arr,unsigned int size){
     return bss;
 }
 
-void q__bss_append(qBinarySafeString* bss,char* str,unsigned int len){
+void q__bss_append(qBinarySafeString* bss,const char* str,unsigned int len){
     // check capacity
     while(bss->capacity<2*(bss->size+len)){
         // realloc
