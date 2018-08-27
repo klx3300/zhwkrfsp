@@ -5,6 +5,7 @@
 #include <sys/statvfs.h>
 #include <fuse3/fuse.h>
 #include "zhwkre/network.h"
+#include "netwrap.h"
 
 int fuse_getattr(const char* fn, struct stat* st, struct fuse_file_info* fi);
 int fuse_readlink(const char* fn, char* dest, size_t buflen);
@@ -26,5 +27,7 @@ int fuse_access(const char* fn, int amode);
 int fuse_creat(const char* fn, mode_t mode, struct fuse_file_info* fi); // create and open
 
 extern qSocket sock;
+extern struct ConnInfo ci;
+extern qMutex mu;
 
 #endif
