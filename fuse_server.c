@@ -9,6 +9,7 @@
 #include <stdlib.h>
 #include <bsd/string.h>
 #include <dirent.h>
+#include "ustruct.h"
 
 qSocket sock;
 qMutex mu;
@@ -56,13 +57,15 @@ int fuse_getattr(const char* fn, struct stat* st, struct fuse_file_info* fi){
     if(rp.rtvl < 0){
         WARNE("client", rp.rtvl, rp.rtvl);
     }
-    if(rp.size != sizeof(struct RpHdr) + sizeof(struct stat)){
-        qLogFailfmt("%s(): protocol error: reply size mismatch %u != %lu", __func__, rp.size, sizeof(struct RpHdr) + sizeof(struct stat));
+    if(rp.size != sizeof(struct RpHdr) + sizeof(struct Ustat)){
+        qLogFailfmt("%s(): protocol error: reply size mismatch %u != %lu", __func__, rp.size, sizeof(struct RpHdr) + sizeof(struct Ustat));
         ABRT;
     }
-    if(re_read(sock, st, sizeof(struct stat), ci)){
+    struct Ustat ustat;
+    if(re_read(sock, &ustat, sizeof(struct Ustat), ci)){
         WARN("read reply failed", -EBUSY);
     }
+    fall_stat(st, ustat);
     mu.unlock(mu);
     return 0;
 }
@@ -459,13 +462,15 @@ int fuse_statfs(const char* fn, struct statvfs* fstat){
     if(rp.rtvl < 0){
         WARNE("client", rp.rtvl, rp.rtvl);
     }
-    if(rp.size != sizeof(struct RpHdr) + sizeof(struct statvfs)){
-        qLogFailfmt("%s(): protocol error: reply size mismatch %u != %lu", __func__, rp.size, sizeof(struct RpHdr) + sizeof(struct statvfs));
+    if(rp.size != sizeof(struct RpHdr) + sizeof(struct Ustatvfs)){
+        qLogFailfmt("%s(): protocol error: reply size mismatch %u != %lu", __func__, rp.size, sizeof(struct RpHdr) + sizeof(struct Ustatvfs));
         ABRT;
     }
-    if(re_read(sock, fstat, sizeof(struct statvfs), ci)){
+    struct Ustatvfs uvfs;
+    if(re_read(sock, &uvfs, sizeof(struct Ustatvfs), ci)){
         WARN("read reply failed", -EBUSY);
     }
+    fall_statvfs(fstat, uvfs);
     mu.unlock(mu);
     return 0;
 }
@@ -610,9 +615,9 @@ int fuse_readdir(const char* dn, void* buf, fuse_fill_dir_t fill, off_t offset, 
         qbss_destructor(repcont);
         WARN("read reply failed", -EBUSY);
     }
-    struct dirent* dirbeg = (struct dirent*) repcont.str;
-    size_t dircnt = (rp.size - sizeof(struct RpHdr)) / sizeof(struct dirent);
-    for(struct dirent* dirit = dirbeg; dirit < dirbeg + dircnt; dirit++){
+    struct Udirent* dirbeg = (struct Udirent*) repcont.str;
+    size_t dircnt = (rp.size - sizeof(struct RpHdr)) / sizeof(struct Udirent);
+    for(struct Udirent* dirit = dirbeg; dirit < dirbeg + dircnt; dirit++){
         struct stat st;
         memset(&st, 0, sizeof(st));
         st.st_ino = dirit->d_ino;
