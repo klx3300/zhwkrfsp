@@ -57,6 +57,7 @@ struct OpOpen {
        bool truncate; // clear the whole file if previously exists. (16)
        bool mkdir; // if this set, will make directory. No file_handle returned.(32)
     */
+    uint32_t mode; // for CREAT/MKDIR
 };
 ```
 
@@ -82,7 +83,7 @@ struct RpOpen{
 
 Very simple.
 
-for mode `mkdir`, you need not to reply.
+for mode `mkdir` , you need not to reply.
 
 #### Read(1)
 

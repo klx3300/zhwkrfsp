@@ -123,6 +123,7 @@ int fuse_mkdir(const char* dn, mode_t mode){
     strcpy(op.filename, dn);
     op.filename[dnsz] = '\0';
     op.flags = OPEN_MKDIR;
+    op.mode = mode;
     // send..
     qBinarySafeString sb = qbss_constructor();
     BSSAPP(sb, head);
@@ -712,6 +713,7 @@ int fuse_creat(const char* fn, mode_t mode, struct fuse_file_info* fi){
     struct OpOpen op;
     FNCPY(op.filename, fn);
     op.flags = 0;
+    op.mode = mode;
     // perform checks
     if(fi->writepage){
         WARNE("write_page", -EINVAL, -EINVAL);

@@ -36,6 +36,7 @@ struct RpHdr {
 struct OpOpen {
     char filename[FILENAME_LEN];
     uint8_t flags;
+    uint32_t mode;
 };
 
 struct RpOpen {
