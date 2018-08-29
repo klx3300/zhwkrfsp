@@ -57,7 +57,7 @@ struct OpOpen {
        bool truncate; // clear the whole file if previously exists. (16)
        bool mkdir; // if this set, will make directory. No file_handle returned.(32)
     */
-    uint32_t mode; // for CREAT/MKDIR
+    uint16_t mode; // for CREAT/MKDIR
 };
 ```
 
