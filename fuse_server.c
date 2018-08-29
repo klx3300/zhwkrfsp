@@ -702,6 +702,38 @@ int fuse_access(const char* fn, int amode){
     return 0;
 }
 
+int fuse_unlink(const char* fn){
+    qLogDebugfmt("%s(): [%s] !", __func__, fn);
+    uint32_t fnsz = strlen(fn);
+    struct OpHdr head;
+    head.opid = OPER_WRITE;
+    head.size = SIZEHDR(struct OpWrit);
+    head.ouid = opuid;
+    struct OpWrit wr;
+    wr.write_mode = WR_REMOVE;
+    strcpy(wr.filename, fn);
+    wr.filename[fnsz] = '\0';
+    qBinarySafeString sb;
+    BSSAPP(sb, head);
+    BSSAPP(sb, wr);
+    if(sockwrite(sock, &sb, 1)){
+        WARN("write failed", -EBUSY);
+    }
+    struct RpHdr rp;
+    if(wait_reply(sock, &rp, ci)){
+        WARN("wait reply failed", -EBUSY);
+    }
+    if(rp.rtvl < 0){
+        WARNE("Client", rp.rtvl, rp.rtvl);
+    }
+    if(rp.size != sizeof(struct RpHdr)){
+        qLogFailfmt("%s(): protocol error: reply size mismatch %u != %lu", __func__, rp.size, sizeof(struct RpHdr));
+        ABRT;
+    }
+    mu.unlock(mu);
+    return 0;
+}
+
 int fuse_creat(const char* fn, mode_t mode, struct fuse_file_info* fi){
     qLogDebugfmt("%s(): %s\n", __func__, fn);
     mu.lock(mu);

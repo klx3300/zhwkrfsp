@@ -25,6 +25,7 @@ int fuse_releasedir(const char* dn, struct fuse_file_info* fi);
 void* fuse_init(struct fuse_conn_info* conn, struct fuse_config* cfg);
 int fuse_access(const char* fn, int amode);
 int fuse_creat(const char* fn, mode_t mode, struct fuse_file_info* fi); // create and open
+int fuse_unlink(const char* fn);
 
 extern qSocket sock;
 extern struct ConnInfo ci;
