@@ -26,16 +26,16 @@ qBinarySafeString qbss__from_array(void* arr,unsigned int size){
 
 void q__bss_append(qBinarySafeString* bss,const char* str,unsigned int len){
     // check capacity
-    while(bss->capacity<2*(bss->size+len)){
+    if(bss->capacity<2*(bss->size+len)){
         // realloc
-        char* tmp = malloc(2*(bss->capacity));
+        char* tmp = malloc(2*(bss->size + len));
         if(tmp == NULL){
             SETERR(ZHWK_ERR_MM_ALLOC_FAIL);
             return;
         }
-        memset(tmp,0,2*(bss->capacity));
+        memset(tmp,0,2*(bss->size + len));
         memcpy(tmp,bss->str,bss->size);
-        bss->capacity = bss->capacity * 2;
+        bss->capacity = 2*(bss->size + len);
         free(bss->str);
         bss->str = tmp;
     }

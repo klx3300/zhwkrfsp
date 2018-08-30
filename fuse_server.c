@@ -1,3 +1,4 @@
+#define FUSE_USE_VERSION 31
 #include "fuse.h"
 #include "prot.h"
 #include "netwrap.h"
@@ -31,7 +32,7 @@ size_t fnsz = strlen(cpsrc); strcpy(cpdst, cpsrc); cpdst[fnsz] = '\0';}while(0)
 #define IFFLAG(flg, tst) if((flg) & (tst))
 
 int fuse_getattr(const char* fn, struct stat* st, struct fuse_file_info* fi){
-    qLogDebugfmt("%s(): [%s]@%lu", __func__, fn, fi->fh);
+    qLogDebugfmt("%s(): [%s]", __func__, fn);
     mu.lock(mu);
     opuid ++;
     struct OpHdr head;
@@ -231,7 +232,7 @@ int fuse_chmod(const char* fn, mode_t mode, struct fuse_file_info* fi){
     wr.write_mode = WR_CHMOD;
     strcpy(wr.filename, fn);
     wr.filename[fnsz] = '\0';
-    qBinarySafeString sb;
+    qBinarySafeString sb = qbss_constructor();
     BSSAPP(sb, head);
     BSSAPP(sb, wr);
     BSSAPP(sb, mode);
@@ -254,7 +255,7 @@ int fuse_chmod(const char* fn, mode_t mode, struct fuse_file_info* fi){
 }
 
 int fuse_truncate(const char* fn, off_t pos, struct fuse_file_info* fi){
-    qLogDebugfmt("%s(): [%s]@%lu trunc at %lu", __func__, fn, fi->fh, pos);
+    qLogDebugfmt("%s(): [%s] trunc at %lu", __func__, fn, pos);
     mu.lock(mu);
     opuid ++;
     struct OpHdr head;
@@ -680,7 +681,7 @@ int fuse_access(const char* fn, int amode){
     wr.write_mode = WR_ACCES;
     strcpy(wr.filename, fn);
     wr.filename[fnsz] = '\0';
-    qBinarySafeString sb;
+    qBinarySafeString sb = qbss_constructor();
     BSSAPP(sb, head);
     BSSAPP(sb, wr);
     BSSAPP(sb, amode);
@@ -713,7 +714,7 @@ int fuse_unlink(const char* fn){
     wr.write_mode = WR_REMOVE;
     strcpy(wr.filename, fn);
     wr.filename[fnsz] = '\0';
-    qBinarySafeString sb;
+    qBinarySafeString sb = qbss_constructor();
     BSSAPP(sb, head);
     BSSAPP(sb, wr);
     if(sockwrite(sock, &sb, 1)){
