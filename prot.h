@@ -73,6 +73,7 @@ struct RdDir{
 #define WR_REMOVE  3
 #define WR_TRUNC   4
 #define WR_ACCES   5
+#define WR_RMDIR   6
 
 struct OpWrit{
     char filename[FILENAME_LEN];

@@ -159,7 +159,7 @@ int fuse_rmdir(const char* dn){
     size_t fnsz = strlen(dn);
     strcpy(wr.filename, dn);
     wr.filename[fnsz] = '\0';
-    wr.write_mode = WR_REMOVE;
+    wr.write_mode = WR_RMDIR;
     qBinarySafeString sb = qbss_constructor();
     BSSAPP(sb, head);
     BSSAPP(sb, wr);
