@@ -3,6 +3,32 @@ Remote File System Protocol. This part offers a client-side FUSE filesystem for 
 
 `libfuse` version 3 used due to poor condition of `man 4 fuse`, they even didn't have `FUSE_WRITE`  documented.
 
+### USAGE
+
+#### Compilation
+
+You should first have `fuse3` installed.
+
+In Archlinux, you may perform `pacman -S fuse3`.
+
+Then, compile with `make`. It will directly generate output executable as `server`.
+
+#### Use
+
+This side should run first. The listening port is `10888`, will become an editable parameter in future versions as soon as I figure out how `libfuse` perform the parameter resolution.
+
+To mount, run:
+
+```shell	
+$ ./server <mount-point>
+```
+
+To unmount, system-provided `umount` will do the job.
+
+### Known Bugs
+
+- `touch` will report error as modification of `a/m/c time` is not currently supported. Will gain this ability in the next version.
+
 ---
 
 ## Protocol

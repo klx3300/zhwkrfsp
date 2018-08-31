@@ -736,7 +736,7 @@ int fuse_unlink(const char* fn){
 }
 
 int fuse_creat(const char* fn, mode_t mode, struct fuse_file_info* fi){
-    qLogDebugfmt("%s(): %s\n", __func__, fn);
+    qLogDebugfmt("%s(): %s as mode %d\n", __func__, fn, mode);
     mu.lock(mu);
     opuid ++;
     struct OpHdr head;
