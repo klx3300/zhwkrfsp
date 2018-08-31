@@ -133,7 +133,7 @@ struct OpWrit{
     uint64_t file_handle;
     uint64_t offset;
     uint64_t count;
-    uint8_t write_mode; // 0 REGULAR; 1 CHMOD; 2 SYMLINK; 3 REMOVE; 4 TRUNC; 5 ACCES
+    uint8_t write_mode; // 0 REGULAR; 1 CHMOD; 2 SYMLINK; 3 REMOVE; 4 TRUNC; 5 ACCES; 6 RMDIR
 };
 ```
 
