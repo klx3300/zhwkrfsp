@@ -16,7 +16,7 @@ qSocket sock;
 qMutex mu;
 struct ConnInfo ci;
 
-uint32_t opuid = 0;
+static uint32_t opuid = 0;
 
 #define VPTR(x) ((void*)&x)
 #define BSSAPP(bss, st) qbss_append(bss, VPTR(st), sizeof(st))
@@ -124,7 +124,7 @@ int fuse_mkdir(const char* dn, mode_t mode){
     strcpy(op.filename, dn);
     op.filename[dnsz] = '\0';
     op.flags = OPEN_MKDIR;
-    op.mode = mode;
+    op.mode = (uint16_t)mode;
     // send..
     qBinarySafeString sb = qbss_constructor();
     BSSAPP(sb, head);
@@ -184,7 +184,7 @@ int fuse_rmdir(const char* dn){
 int fuse_symlink(const char* fn, const char* srcfn){
     qLogDebugfmt("%s(): %s -> %s", __func__, srcfn, fn);
     mu.lock(mu);
-    uint32_t fnsz = strlen(fn), srcfnsz = strlen(srcfn);
+    uint32_t fnsz = (uint32_t)strlen(fn), srcfnsz = (uint32_t)strlen(srcfn);
     opuid ++;
     struct OpHdr head;
     head.opid = OPER_WRITE;
@@ -265,7 +265,7 @@ int fuse_truncate(const char* fn, off_t pos, struct fuse_file_info* fi){
     struct OpWrit wr;
     FNCPY(wr.filename, fn);
     wr.write_mode = WR_TRUNC;
-    wr.offset = pos;
+    wr.offset = (uint64_t)pos;
     qBinarySafeString sb = qbss_constructor();
     BSSAPP(sb, head);
     BSSAPP(sb, wr);
@@ -371,7 +371,7 @@ int fuse_read(const char* fn, char* buf, size_t bufsize, off_t pos, struct fuse_
     FNCPY(rd.filename, fn);
     rd.file_handle = fi->fh;
     rd.read_mode = RD_REGULAR;
-    rd.offset = pos;
+    rd.offset = (uint64_t)pos;
     rd.count = bufsize;
     qBinarySafeString sb = qbss_constructor();
     BSSAPP(sb, head);
@@ -804,6 +804,49 @@ int fuse_creat(const char* fn, mode_t mode, struct fuse_file_info* fi){
     if(!ro.ignore_above){
         fi->fh = ro.file_handle;
         qLogDebugfmt("%s(): file handle set as %lu", __func__, fi->fh);
+    }
+    mu.unlock(mu);
+    return 0;
+}
+
+int fuse_utimens(const char* fn, const struct timespec tv[2], struct fuse_file_info* fi){
+    qLogDebugfmt("%s(): [%s] A %ld.%ld, M %ld,%ld \n", __func__, fn, tv[0].tv_sec, tv[0].tv_nsec, tv[1].tv_sec, tv[1].tv_nsec);
+    uint32_t fnsz = strlen(fn);
+    struct OpHdr head;
+    head.opid = OPER_WRITE;
+    head.size = SIZEHDR(struct OpWrit) + sizeof(struct TimeModder);
+    head.ouid = opuid;
+    struct OpWrit wr;
+    wr.write_mode = WR_MODTIME;
+    strcpy(wr.filename, fn);
+    wr.filename[fnsz] = '\0';
+    qBinarySafeString sb = qbss_constructor();
+    BSSAPP(sb, head);
+    BSSAPP(sb, wr);
+    struct TimeModder tmdr;
+    tmdr.atime = tv[0].tv_sec;
+    tmdr.atime_nsec = tv[0].tv_nsec;
+    tmdr.mtime = tv[1].tv_sec;
+    tmdr.mtime_nsec = tv[1].tv_nsec;
+    tmdr.flags = 0;
+    if(tv[0].tv_nsec == UTIME_NOW) tmdr.flags |= TM_ANOW;
+    else if(tv[0].tv_nsec == UTIME_OMIT) tmdr.flags |= TM_AIGN;
+    if(tv[1].tv_nsec == UTIME_NOW) tmdr.flags |= TM_MNOW;
+    else if(tv[1].tv_nsec == UTIME_OMIT) tmdr.flags |= TM_MIGN;
+    BSSAPP(sb, tmdr);
+    if(sockwrite(sock, &sb, 1)){
+        WARN("write failed", -EBUSY);
+    }
+    struct RpHdr rp;
+    if(wait_reply(sock, &rp, ci)){
+        WARN("wait reply failed", -EBUSY);
+    }
+    if(rp.rtvl < 0){
+        WARNE("Client", rp.rtvl, rp.rtvl);
+    }
+    if(rp.size != sizeof(struct RpHdr)){
+        qLogFailfmt("%s(): protocol error: reply size mismatch %u != %lu", __func__, rp.size, sizeof(struct RpHdr));
+        ABRT;
     }
     mu.unlock(mu);
     return 0;

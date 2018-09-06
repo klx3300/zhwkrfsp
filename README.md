@@ -27,8 +27,6 @@ To unmount, system-provided `umount` will do the job.
 
 ### Known Bugs
 
-- `touch` will report error as modification of `a/m/c time` is not currently supported. Will gain this ability in the next version.
-
 ---
 
 ## Protocol
@@ -159,7 +157,7 @@ struct OpWrit{
     uint64_t file_handle;
     uint64_t offset;
     uint64_t count;
-    uint8_t write_mode; // 0 REGULAR; 1 CHMOD; 2 SYMLINK; 3 REMOVE; 4 TRUNC; 5 ACCES; 6 RMDIR
+    uint8_t write_mode; // 0 REGULAR; 1 CHMOD; 2 SYMLINK; 3 REMOVE; 4 TRUNC; 5 ACCES; 6 RMDIR; 7 MODTIME
 };
 ```
 
@@ -184,6 +182,20 @@ or
 nothing - for truncate files.
 
 in this case, the count will be ignored, and the file will be truncated at position `offset`.
+
+or
+
+```C
+struct TimeModder{
+    long int st_atime;
+    long int st_atimensec;
+    long int st_mtime;
+    long int st_mtimensec;
+    uint8_t  special_flags; // 1 ATIME_NOW 2 ATIME_IGNORE 4 MTIME_NOW 8 MTIME_IGNORE
+};
+```
+
+for modifying a/m times. also no file_handle provided; filename will do its work.
 
 Reply:
 

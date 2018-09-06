@@ -29,7 +29,8 @@ static struct fuse_operations zhwkrfsp = {
     .init = fuse_init,
     .access = fuse_access,
     .create = fuse_creat,
-    .unlink = fuse_unlink
+    .unlink = fuse_unlink,
+    .utimens = fuse_utimens
 };
 
 #define OFFSETOF(t, m) ((off_t)&(((t*)(void*)NULL)->m))

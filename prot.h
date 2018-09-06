@@ -74,6 +74,7 @@ struct RdDir{
 #define WR_TRUNC   4
 #define WR_ACCES   5
 #define WR_RMDIR   6
+#define WR_MODTIME 7
 
 struct OpWrit{
     char filename[FILENAME_LEN];
@@ -81,6 +82,19 @@ struct OpWrit{
     uint64_t offset;
     uint64_t count;
     uint8_t write_mode;
+};
+
+#define TM_ANOW 1
+#define TM_AIGN 2
+#define TM_MNOW 4
+#define TM_MIGN 8
+
+struct TimeModder{
+    int64_t atime;
+    int64_t atime_nsec;
+    int64_t mtime;
+    int64_t mtime_nsec;
+    uint8_t flags;
 };
 
 struct OpClos{
